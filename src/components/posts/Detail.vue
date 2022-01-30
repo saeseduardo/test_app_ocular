@@ -1,50 +1,62 @@
 <template>
     <div>
       <b-row class="justify-content-center">
-        <h3>Posts</h3>
+        <h3>Post</h3>
         <b-col md="6" offset-md="2">
-            <b-card
-              v-bind:title="post.title"
-              v-bind:img-src="getPhoto(post.photo.url)"
-              img-alt="Image"
-              img-top
-              img-height="200"
-              img-width="200"
-              tag="post"
-              style="max-width: 30rem;"
-              class="mb-2"
-            >
-              <b-card-text>
-                <p> <small> By: {{ post.user.user_name }} <b>{{ getDate(post.created_at) }}</b> </small></p>
-                {{post.content}}
-                <div class="mt-4">
+          <b-row class="mb-2">
+            <b-col lg="4">
+              <b-button v-bind:name="post.id" variant="outline-primary" class="btn btn-outline " size="sm" v-on:click="previus(post)">
+                <b-icon-arrow-left></b-icon-arrow-left>
+              </b-button>
+            </b-col>
+            <b-col lg="4">
+              <b-button v-bind:name="post.id" variant="outline-primary" class="btn btn-outline" size="sm" v-on:click="nextPost(post)">
+                <b-icon-arrow-right></b-icon-arrow-right>
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-card
+            v-bind:title="post.title"
+            v-bind:img-src="getPhoto(post.photo)"
+            img-alt="Image"
+            img-top
+            img-height="200"
+            img-width="200"
+            tag="post"
+            style="max-width: 30rem;"
+            class="mb-2 shadow-sm p-3 mb-5 bg-white rounded"
+          >
+            <b-card-text>
+              <p> <small> By: {{ post.user.user_name }} <b>{{ getDate(post.created_at) }}</b> </small></p>
+              {{post.content}}
+              <div class="mt-4">
 
-                  <b-button v-bind:name="post.id" variant="success" class="text-white" size="sm" v-on:click="showModal(post)">Comment</b-button>
+                <b-button v-bind:name="post.id" variant="success" class="text-white" size="sm" v-on:click="showModal(post)">Comment</b-button>
 
-                  <b-button  variant="primary" class="text-white" size="sm" v-on:click="like(post.id)">
-                    <b-icon-hand-thumbs-up></b-icon-hand-thumbs-up>
-                    ({{ likes }})
-                  </b-button>
-                  <!-- <b-button  variant="danger" class="text-white" size="sm" v-on:click="like(post.id)">
-                    <b-icon-hand-thumbs-down></b-icon-hand-thumbs-down>
-                    ({{ likes }})
-                  </b-button> -->
-                </div>
-                <div class="mt-4 border-top">
-                  <h5 class="text-start">Comments</h5>
+                <b-button  variant="primary" class="text-white" size="sm" v-on:click="like(post.id)">
+                  <b-icon-hand-thumbs-up></b-icon-hand-thumbs-up>
+                  ({{ likes }})
+                </b-button>
+                <!-- <b-button  variant="danger" class="text-white" size="sm" v-on:click="like(post.id)">
+                  <b-icon-hand-thumbs-down></b-icon-hand-thumbs-down>
+                  ({{ likes }})
+                </b-button> -->
+              </div>
+              <div class="mt-4 border-top">
+                <h5 class="text-start">Comments</h5>
 
-                  <b-list-group>
-                    <b-list-group-item v-for="comment in comments" :key="comment.id">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">@{{ comment.user.user_name }}</h5>
-                        <small class="text-muted">{{ diffDaysOfComment(comment.created_at) }}</small>
-                      </div>
-                      <p class="mb-1 text-start">{{ comment.comment }}</p>
-                    </b-list-group-item>
-                    </b-list-group>
-                </div>
-              </b-card-text>
-            </b-card>
+                <b-list-group>
+                  <b-list-group-item v-for="comment in comments" :key="comment.id" class="shadow-sm p-3 mb-1 bg-white rounded">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h5 class="mb-1">@{{ comment.user.user_name }}</h5>
+                      <small class="text-muted">{{ diffDaysOfComment(comment.created_at) }}</small>
+                    </div>
+                    <p class="mb-1 text-start">{{ comment.comment }}</p>
+                  </b-list-group-item>
+                  </b-list-group>
+              </div>
+            </b-card-text>
+          </b-card>
         </b-col>
       </b-row>
 
@@ -102,7 +114,6 @@ export default {
   },
 
   mounted () {
-    this.user = window.localStorage.getItem('user')
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -116,6 +127,7 @@ export default {
       .then(response => {
         this.post = response.data.data
         this.comments = response.data.data.comments
+        this.likes = response.data.data.likes.length
       })
   },
   methods: {
@@ -124,10 +136,11 @@ export default {
     },
 
     getPhoto (photo) {
-      if (!photo) {
-        return ''
+      if (photo) {
+        const url = photo.url
+        return `http://localhost/${url}`
       }
-      return `http://localhost/${photo}`
+      return ''
     },
 
     addComment () {
@@ -158,7 +171,9 @@ export default {
       axios
         .get(`http://localhost/api/v1/like/post/${this.postId}`, config)
         .then(response => {
-          this.likes = response.data.data.likes.length
+          if (response.data.data) {
+            this.likes = response.data.data.likes.length
+          }
         })
     },
 
@@ -182,6 +197,44 @@ export default {
       }
 
       return diffDate + 'days ago'
+    },
+    nextPost () {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('token')}`
+        }
+      }
+
+      this.postId = parseInt(this.postId) + 1
+
+      console.log(this.postId)
+
+      axios
+        .get(`http://localhost/api/v1/post/${this.postId}`, config)
+        .then(response => {
+          this.post = response.data.data
+          this.comments = response.data.data.comments
+          this.likes = response.data.data.likes.length
+        })
+    },
+    previus () {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem('token')}`
+        }
+      }
+
+      this.postId = parseInt(this.postId) - 1
+
+      console.log(this.postId)
+
+      axios
+        .get(`http://localhost/api/v1/post/${this.postId}`, config)
+        .then(response => {
+          this.post = response.data.data
+          this.comments = response.data.data.comments
+          this.likes = response.data.data.likes.length
+        })
     }
   }
 }

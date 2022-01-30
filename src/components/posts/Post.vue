@@ -1,11 +1,12 @@
 <template>
     <div>
       <b-row class="justify-content-center">
-        <h3>Posts</h3>
+        <h1>Posts</h1>
+        <h2 v-if="!posts.length">No records</h2>
         <b-col v-for="post in posts" :key="post.id">
             <b-card
               v-bind:title="post.title"
-              v-bind:img-src="getPhoto(post.photo.url)"
+              v-bind:img-src="getPhoto(post.photo)"
               v-bind:img-alt="post.title"
               img-top
               img-height="200"
@@ -13,7 +14,7 @@
               border-variant="shadow"
               tag="post"
               style="max-width: 20rem;"
-              class="mb-2"
+              class="mb-2 shadow-sm p-3 mb-5 bg-white rounded"
             >
               <b-card-text>
                 {{`${post.content.slice(0,50)}...`}}
@@ -28,7 +29,7 @@
       <b-row class="justify-content-center">
         <b-col md="6" offset-md="3">
           <nav>
-            <ul class="pagination">
+            <ul class="pagination" v-if="posts.length">
                 <li class="page-item" v-show="pagination.prev_page_url">
                     <a href="#" class="page-link" @click.prevent="getPreviousPage">
                         <span>
@@ -36,10 +37,10 @@
                         </span>
                     </a>
                 </li>
-                <li class="page-item" :class="{ 'active': link.active }" v-for="(link, index) in pagination.links" :key="index">
-                    <a href="#" class="page-link" @click.prevent="getPage(link)">
+                <li class="page-item" :class="{ 'active': like.active }" v-for="(like, index) in pagination.links" :key="index">
+                    <a href="#" class="page-link" @click.prevent="getPage(like)">
                         <span >
-                            {{ link.label }}
+                            {{ like.label }}
                         </span>
                     </a>
                 </li>
@@ -113,7 +114,11 @@ export default {
         })
     },
     getPhoto (photo) {
-      return `http://localhost/${photo}`
+      if (photo) {
+        const url = photo.url
+        return `http://localhost/${url}`
+      }
+      return ''
     },
     getPreviousPage () {
       const config = {
