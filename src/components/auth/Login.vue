@@ -81,7 +81,7 @@ export default {
           if (response.data) {
             this.error = response.data.data.error
           }
-          window.localStorage.setItem('user', this.user.user_name)
+          window.localStorage.setItem('user', response.data.data.user.user_name)
           window.localStorage.setItem('token', response.data.data.token)
           this.$router.push('/posts')
         })

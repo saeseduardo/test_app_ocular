@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-navbar toggleable="lg" type="dark" variant="primary">
-      <b-navbar-brand href="#">NavBar</b-navbar-brand>
+      <b-navbar-brand href="#">Ocular</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -20,7 +20,7 @@
               <em v-if="user">{{ user }}</em>
             </template>
             <b-dropdown-item href="#">Profile</b-dropdown-item>
-            <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+            <b-dropdown-item href="#" v-on:click.prevent="signOut">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-collapse>
@@ -38,6 +38,13 @@ export default {
   },
   mounted () {
     this.user = window.localStorage.getItem('user')
+  },
+  methods: {
+    signOut () {
+      window.localStorage.removeItem('token')
+      window.localStorage.removeItem('user')
+      this.$router.push('/')
+    }
   }
 }
 </script>
