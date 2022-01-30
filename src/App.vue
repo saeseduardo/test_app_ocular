@@ -1,12 +1,20 @@
 <template>
   <div id="app">
+    <NavBar />
+    <b-container fluid >
     <router-view/>
+    </b-container>
   </div>
 </template>
 
 <script>
+import NavBar from './components/NavBar'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    NavBar
+  }
 }
 </script>
 
@@ -17,6 +25,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-left: 4px;
 }
 </style>

@@ -1,21 +1,42 @@
 <template>
     <div>
+      <b-row class="justify-content-center">
         <h3>Posts</h3>
-        <div class='ui centered card' v-for="post in posts" :key="post.id">
-            <div class='content' >
-                <div class='header'>
-                    {{ post.title }}
-                </div>
-                <div class='meta'>
-                    {{ post.content }}
-                </div>
-                <div class='extra content'>
-                    <span class='right floated edit icon'>
-                    <i class='edit icon'></i>
-                    </span>
-                </div>
-            </div>
-        </div>
+        <b-col></b-col >
+        <b-col v-for="post in posts" :key="post.id">
+            <b-card
+              v-bind:name="post.id"
+              v-bind:title="post.title"
+              v-bind:img-src="post.photo"
+              img-alt="Image"
+              img-top
+              tag="post"
+              style="max-width: 20rem;"
+              class="mb-2 text-center"
+            >
+              <b-card-text>
+                {{`${post.content.slice(0,50)}...`}}
+              </b-card-text>
+
+              <b-button variant="primary" class="text-white" @click="detail(post.id)">See more</b-button>
+            </b-card>
+        </b-col>
+        <b-col></b-col >
+      </b-row>
+      <b-row class="justify-content-center">
+        <b-col></b-col >
+        <b-col>
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+          ></b-pagination>
+
+          <p class="mt-3">Current Page: {{ currentPage }}</p>
+        </b-col>
+        <b-col></b-col >
+        </b-row>
     </div>
 </template>
 
@@ -26,13 +47,34 @@ export default {
   name: 'Posts',
   data () {
     return {
-      posts: null
+      user: null,
+      posts: null,
+      currentPage: 1,
+      perPage: 1
     }
   },
   mounted () {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem('token')}`
+      }
+    }
     axios
-      .get('http://localhost/api/v1/posts')
-      .then(response => (this.post = response))
+      .get('http://localhost/api/v1/posts', config)
+      .then(response => {
+        this.posts = response.data.data.data
+        // this.perPage = response.data.per_page
+      })
+  },
+  computed: {
+    rows () {
+      return this.posts.length
+    }
+  },
+  methods: {
+    detail (post) {
+      console.log(post)
+    }
   }
 }
 </script>
