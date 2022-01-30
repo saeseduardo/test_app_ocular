@@ -2,7 +2,6 @@
     <div>
       <b-row class="justify-content-center">
         <h3>Posts</h3>
-        <b-col></b-col >
         <b-col v-for="post in posts" :key="post.id">
             <b-card
               v-bind:name="post.id"
@@ -12,31 +11,30 @@
               img-top
               tag="post"
               style="max-width: 20rem;"
-              class="mb-2 text-center"
+              class="mb-2"
             >
               <b-card-text>
                 {{`${post.content.slice(0,50)}...`}}
               </b-card-text>
 
-              <b-button variant="primary" class="text-white" @click="detail(post.id)">See more</b-button>
+              <b-button v-bind:name="post.id" variant="primary" class="text-white" size="sm" v-on:click="detail(post.id)">See more</b-button>
+              <b-button v-bind:name="post.id" variant="warning" class="text-white" size="sm" v-on:click="edit(post.id)">Edit</b-button>
+              <b-button v-bind:name="post.id" variant="danger" class="text-white" size="sm" v-on:click="destroid(post.id)">Delete</b-button>
             </b-card>
         </b-col>
-        <b-col></b-col >
       </b-row>
       <b-row class="justify-content-center">
-        <b-col></b-col >
-        <b-col>
+        <b-col md="6" offset-md="3">
           <b-pagination
             v-model="currentPage"
             :total-rows="rows"
             :per-page="perPage"
             aria-controls="my-table"
-          ></b-pagination>
-
-          <p class="mt-3">Current Page: {{ currentPage }}</p>
+          >
+          </b-pagination>
+          <p class="text-left">Current Page: {{ currentPage }}</p>
         </b-col>
-        <b-col></b-col >
-        </b-row>
+      </b-row>
     </div>
 </template>
 
@@ -48,12 +46,13 @@ export default {
   data () {
     return {
       user: null,
-      posts: null,
+      posts: [],
       currentPage: 1,
       perPage: 1
     }
   },
   mounted () {
+    this.user = window.localStorage.getItem('user')
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -63,7 +62,6 @@ export default {
       .get('http://localhost/api/v1/posts', config)
       .then(response => {
         this.posts = response.data.data.data
-        // this.perPage = response.data.per_page
       })
   },
   computed: {
@@ -73,7 +71,13 @@ export default {
   },
   methods: {
     detail (post) {
-      console.log(post)
+      this.$router.push(`/post/${post}`)
+    },
+    edit (post) {
+      this.$router.push(`/post/${post}/edit`)
+    },
+    destroid (post) {
+
     }
   }
 }
