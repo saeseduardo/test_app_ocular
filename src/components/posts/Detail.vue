@@ -5,7 +5,7 @@
         <b-col md="6" offset-md="3">
             <b-card
               v-bind:title="post.title"
-              v-bind:img-src="post.photo"
+              v-bind:img-src="post.photo.url"
               img-alt="Image"
               img-top
               tag="post"

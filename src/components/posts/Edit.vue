@@ -4,7 +4,7 @@
         <b-row class="my-1 justify-content-center">
         <h1>Create Post</h1>
         <b-col md="4">
-          <b-form @submit.prevent="store">
+          <b-form @submit.prevent="update">
             <b-form-group
               id="fieldset-1"
               label="Title"
@@ -40,7 +40,6 @@
 
               <b-form-file
                 v-model="photo"
-                :state="Boolean(photo)"
               ></b-form-file><br>
               <b-button variant="success" type="submit">Save</b-button>
           </b-form>
@@ -118,9 +117,20 @@ export default {
           })
         })
       })
+
+    this.postId = this.$route.params.post
+
+    axios
+      .get(`http://localhost/api/v1/post/${this.postId}`, config)
+      .then(response => {
+        this.title = response.data.data.title
+        this.content = response.data.data.content
+        this.category = response.data.data.category_id
+        this.selected = response.data.data.category_id
+      })
   },
   methods: {
-    async store () {
+    async update () {
       const config = {
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -136,7 +146,7 @@ export default {
 
       axios.post(ENDPOINT_PATH + 'post', formData, config)
         .then(response => {
-          this.$router.push('posts')
+          this.$router.push('/posts')
         })
         .catch(error => console.log(error.response))
     }

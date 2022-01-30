@@ -6,7 +6,7 @@
             <b-card
               v-bind:name="post.id"
               v-bind:title="post.title"
-              v-bind:img-src="post.photo"
+              v-bind:img-src="getPhoto(post.photo.url)"
               img-alt="Image"
               img-top
               tag="post"
@@ -78,6 +78,9 @@ export default {
     },
     destroid (post) {
 
+    },
+    getPhoto (photo) {
+      return `http://localhost/${photo}`
     }
   }
 }
