@@ -11,7 +11,10 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import VueHasErrorLaravel from 'vue-has-error-laravel'
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
+Vue.use(VueSweetalert2)
 Vue.use(VueHasErrorLaravel)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)

@@ -3,48 +3,72 @@
     <navBar></navBar>
     <b-container fluid>
         <b-row class="my-1 justify-content-center">
-        <h1>Create Post</h1>
-        <b-col md="4">
-          <b-form @submit.prevent="update">
-            <b-form-group
-              id="fieldset-1"
-              label="Title"
-              label-for="input-1"
-              valid-feedback="Thank you!"
-              :invalid-feedback="invalidTitle"
-              :state="state"
-              >
-              <b-form-input id="input-1" v-model="title" :state="state" trim></b-form-input>
-              </b-form-group>
-              <br>
+        <b-col md="4" v-if="roleId == 1">
+          <b-card
+            title="Create Post"
+            tag="register"
+            style="max-width: 30rem;"
+            class="mb-2 shadow-sm p-3 mb-5 bg-white rounded"
+          >
+            <b-card-text>
+            <b-form @submit.prevent="update">
               <b-form-group
-              id="fieldset-2"
-              label="Content"
-              label-for="input-2"
-              valid-feedback="Thank you!"
-              :invalid-feedback="invalidContent"
-              :state="state"
-              >
-              <b-form-textarea id="input-2" v-model="content" :state="stateContent" type="text" trim></b-form-textarea>
-              </b-form-group>
-              <br>
-              <b-form-group
-              id="fieldset-3"
-              label="Category"
-              label-for="input-3"
-              valid-feedback="Thank you!"
-              :invalid-feedback="invalidCategory"
-              :state="state"
-              >
-              <b-form-select id="input-3" v-model="category" :options="options" :state="stateCategory" type="text" trim></b-form-select>
-              </b-form-group><br>
+                id="fieldset-1"
+                label="Title"
+                label-for="input-1"
+                valid-feedback=""
+                :invalid-feedback="invalidTitle"
+                :state="state"
+                >
+                <b-form-input id="input-1" v-model="title" :state="state" trim></b-form-input>
+                <ul v-if="errors.title !== undefined" class="text-start">
+                  <li v-for="(error, index) in errors.title" :key="index" class="text-danger"><small> {{ error }} </small></li>
+                </ul>
+                </b-form-group>
+                <br>
+                <b-form-group
+                id="fieldset-2"
+                label="Content"
+                label-for="input-2"
+                valid-feedback=""
+                :invalid-feedback="invalidContent"
+                :state="state"
+                >
+                <b-form-textarea id="input-2" v-model="content" :state="stateContent" type="text" trim></b-form-textarea>
+                <ul v-if="errors.content !== undefined" class="text-start">
+                  <li v-for="(error, index) in errors.content" :key="index" class="text-danger"><small> {{ error }} </small></li>
+                </ul>
+                </b-form-group>
+                <br>
+                <b-form-group
+                id="fieldset-3"
+                label="Category"
+                label-for="input-3"
+                valid-feedback="Thank you!"
+                :invalid-feedback="invalidCategory"
+                :state="state"
+                >
+                <b-form-select id="input-3" v-model="category" :options="options" :state="stateCategory" type="text" trim></b-form-select>
+                <ul v-if="errors.category !== undefined" class="text-start">
+                  <li v-for="(error, index) in errors.category" :key="index" class="text-danger"><small> {{ error }} </small></li>
+                </ul>
+                </b-form-group><br>
 
-              <b-form-file
-                v-model="photo"
-              ></b-form-file><br>
-              <b-button variant="success" type="submit">Save</b-button>
-          </b-form>
-          <b-alert show variant="danger" v-if="error">{{error}}</b-alert>
+                <b-form-file
+                  v-model="photo"
+                  :state="photo"
+                ></b-form-file>
+                <ul v-if="errors.photo !== undefined" class="text-start">
+                  <li v-for="(error, index) in errors.photo" :key="index" class="text-danger"><small> {{ error }} </small></li>
+                </ul>
+                <br>
+                <b-button variant="success" type="submit">Save</b-button>
+            </b-form>
+            </b-card-text>
+          </b-card>
+        </b-col>
+         <b-col md="4" v-if="roleId != 1">
+          <b-alert show variant="danger" >You do not have sufficient permissions to edit a post</b-alert>
         </b-col>
         </b-row>
     </b-container>
@@ -67,8 +91,9 @@ export default {
       title: '',
       content: '',
       category: '',
-      error: '',
+      errors: {},
       photo: '',
+      roleId: null,
       selected: null,
       options: [
         { value: null, text: 'Please select an option' }
@@ -103,6 +128,7 @@ export default {
     }
   },
   mounted () {
+    this.roleId = window.localStorage.getItem('user_role_id')
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -149,11 +175,16 @@ export default {
       formData.append('category', this.category)
       formData.append('photo', this.photo)
 
-      axios.post(ENDPOINT_PATH + 'post', formData, config)
+      axios.post(ENDPOINT_PATH + `post/update/${this.postId}`, formData, config)
         .then(response => {
+          console.log(response)
+          this.$swal('Created', 'Your post has been successfully edited', 'info')
           this.$router.push('/posts')
+        }).catch((error) => {
+          if (error.response.status === 422) {
+            this.errors = error.response.data.errors
+          }
         })
-        .catch(error => console.log(error.response))
     }
   }
 }

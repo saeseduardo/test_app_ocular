@@ -29,7 +29,7 @@
           >
             <b-card-text>
               <p> <small> By: {{ post.user.user_name }} <b>{{ getDate(post.created_at) }}</b> </small></p>
-              {{post.content}}
+              <p class="text-justify">{{post.content}}</p>
               <div class="mt-4">
 
                 <b-button v-bind:name="post.id" variant="success" class="text-white" size="sm" v-on:click="showModal(post)">Comment</b-button>
@@ -44,11 +44,11 @@
                 </b-button> -->
               </div>
               <div class="mt-4 border-top">
-                <h5 class="text-start">Comments</h5>
+                <h5 class="text-justify">Comments</h5>
 
                 <b-list-group>
                   <b-list-group-item v-for="comment in comments" :key="comment.id" class="shadow-sm p-3 mb-1 bg-white rounded">
-                    <div class="d-flex w-100 justify-content-between">
+                    <div class="d-flex w-100 justify-content-start">
                       <h5 class="mb-1">@{{ comment.user.user_name }}</h5>
                       <small class="text-muted">{{ diffDaysOfComment(comment.created_at) }}</small>
                     </div>
@@ -70,11 +70,14 @@
               id="fieldset-1"
               label="Comment"
               label-for="input-1"
-              valid-feedback="Thank you!"
+              valid-feedback=""
               :invalid-feedback="invalidComment"
               :state="state"
               >
               <b-form-textarea id="input-1" v-model="comment" :state="state" trim></b-form-textarea>
+              <ul v-if="errors.comment !== undefined" class="text-start">
+                <li v-for="(error, index) in errors.comment" :key="index" class="text-danger"><small> {{ error }} </small></li>
+              </ul>
               </b-form-group>
           </b-form>
         <b-button class="mt-3" variant="outline-danger" @click="hideModal">Close Me</b-button>
@@ -103,7 +106,8 @@ export default {
       commentPostTitle: '',
       likes: 0,
       roleId: null,
-      post: {}
+      post: {},
+      errors: {}
     }
   },
 
@@ -165,6 +169,11 @@ export default {
         .then(response => {
           this.comments = response.data.data.comments
           this.$refs['comment-modal'].hide()
+          this.comment = ''
+        }).catch((error) => {
+          if (error.response.status === 422) {
+            this.errors = error.response.data.errors
+          }
         })
     },
 
@@ -174,7 +183,13 @@ export default {
           Authorization: `Bearer ${window.localStorage.getItem('token')}`
         }
       }
-
+      this.$swal({
+        position: 'top-end',
+        icon: 'success',
+        title: 'I like it',
+        showConfirmButton: false,
+        timer: 1500
+      })
       axios
         .get(`http://localhost/api/v1/like/post/${this.postId}`, config)
         .then(response => {
@@ -214,8 +229,6 @@ export default {
 
       this.postId = parseInt(this.postId) + 1
 
-      console.log(this.postId)
-
       axios
         .get(`http://localhost/api/v1/post/${this.postId}`, config)
         .then(response => {
@@ -232,9 +245,6 @@ export default {
       }
 
       this.postId = parseInt(this.postId) - 1
-
-      console.log(this.postId)
-
       axios
         .get(`http://localhost/api/v1/post/${this.postId}`, config)
         .then(response => {
@@ -262,5 +272,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.text-justify {
+  text-align: justify;
 }
 </style>

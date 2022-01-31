@@ -112,13 +112,28 @@ export default {
           Authorization: `Bearer ${window.localStorage.getItem('token')}`
         }
       }
-
-      axios
-        .delete(`http://localhost/api/v1/post/delete/${post}`, config)
-        .then(response => {
-          this.posts = response.data.data.data
-          this.pagination = response.data.data
-        })
+      this.$swal({
+        title: 'Are you sure?',
+        text: 'You can\'t revert your action',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes Delete it!',
+        cancelButtonText: 'No, Keep it!',
+        showCloseButton: true,
+        showLoaderOnConfirm: true
+      }).then((result) => {
+        if (result.value) {
+          this.$swal('Deleted', 'You successfully deleted this file', 'success')
+          axios
+            .delete(`http://localhost/api/v1/post/delete/${post}`, config)
+            .then(response => {
+              this.posts = response.data.data.data
+              this.pagination = response.data.data
+            })
+        } else {
+          this.$swal('Cancelled', 'Your file is still intact', 'info')
+        }
+      })
     },
     getPhoto (photo) {
       if (photo) {
