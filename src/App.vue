@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <NavBar />
-    <b-container fluid >
     <router-view/>
-    </b-container>
   </div>
 </template>
 
@@ -14,6 +11,14 @@ export default {
   name: 'App',
   components: {
     NavBar
+  },
+  data () {
+    return {
+      user: null
+    }
+  },
+  mounted () {
+    this.user = window.localStorage.getItem('token')
   }
 }
 </script>

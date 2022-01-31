@@ -1,5 +1,6 @@
 <template>
   <div >
+    <navBar></navBar>
     <b-container fluid>
         <b-row class="my-1 justify-content-center">
         <h1>Create Post</h1>
@@ -52,11 +53,15 @@
 
 <script>
 import axios from 'axios'
+import NavBar from '@/components/NavBar'
 
 const ENDPOINT_PATH = 'http://localhost/api/v1/'
 
 export default {
   name: 'Edit',
+  components: {
+    NavBar
+  },
   data () {
     return {
       title: '',

@@ -1,47 +1,61 @@
 <template>
   <div >
+    <navBar></navBar>
     <b-container fluid>
-        <b-row class="my-1 justify-content-center">
-        <h1>Login</h1>
-        <b-col md="2">
-          <b-form @submit.prevent="login">
-            <b-form-group
-              id="fieldset-1"
-              label="User name"
-              label-for="input-1"
-              valid-feedback="Thank you!"
-              :invalid-feedback="invalidFeedback"
-              :state="state"
-              >
-              <b-form-input id="input-1" v-model="username" :state="state" trim></b-form-input>
-              </b-form-group>
-
+        <b-row class="justify-content-center">
+        <b-col md="6" offset-md="2" class="mt-5">
+          <b-card
+            title="Login"
+            tag="post"
+            style="max-width: 30rem;"
+            class="mb-2 shadow-sm p-3 mb-5 bg-white rounded"
+          >
+            <b-card-text>
+              <b-form @submit.prevent="login">
               <b-form-group
-              id="fieldset-2"
-              label="Password"
-              label-for="input-2"
-              valid-feedback="Thank you!"
-              :invalid-feedback="invalidFeedbackPassword"
-              :state="state"
-              >
-              <b-form-input id="input-2" v-model="password" :state="statePassword" type="password" trim></b-form-input>
-              </b-form-group>
-              <b-button variant="success" type="submit">Login</b-button>
-          </b-form>
-          <b-alert show variant="danger" v-if="error">{{error}}</b-alert>
+                id="fieldset-1"
+                label="User name"
+                label-for="input-1"
+                valid-feedback="Thank you!"
+                :invalid-feedback="invalidFeedback"
+                :state="state"
+                >
+                <b-form-input id="input-1" v-model="username" :state="state" trim></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                id="fieldset-2"
+                label="Password"
+                label-for="input-2"
+                valid-feedback="Thank you!"
+                :invalid-feedback="invalidFeedbackPassword"
+                :state="state"
+                >
+                <b-form-input id="input-2" v-model="password" :state="statePassword" type="password" trim></b-form-input>
+                </b-form-group>
+                <b-button variant="success" type="submit">Login</b-button>
+            </b-form>
+            <b-alert show variant="danger" v-if="error">{{error}}</b-alert>
+            </b-card-text>
+            <small class="text-primary" v-on:click="register()">Register</small>
+          </b-card>
         </b-col>
-        </b-row>
+      </b-row>
     </b-container>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import NavBar from '@/components/NavBar'
 
 const ENDPOINT_PATH = 'http://localhost/api/v1/'
 
 export default {
   name: 'Login',
+  components: {
+    NavBar
+  },
   data () {
     return {
       username: '',
@@ -82,9 +96,14 @@ export default {
             this.error = response.data.data.error
           }
           window.localStorage.setItem('user', response.data.data.user.user_name)
+          window.localStorage.setItem('user_role_id', response.data.data.user.role.id)
+          window.localStorage.setItem('user_role_name', response.data.data.user.role.name)
           window.localStorage.setItem('token', response.data.data.token)
           this.$router.push('/posts')
         })
+    },
+    register () {
+      this.$router.push('/register')
     }
   }
 }

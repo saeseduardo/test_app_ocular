@@ -1,5 +1,6 @@
 <template>
     <div>
+      <navBar></navBar>
       <b-row class="justify-content-center">
         <h1>Posts</h1>
         <h2 v-if="!posts.length">No records</h2>
@@ -21,8 +22,8 @@
               </b-card-text>
 
               <b-button v-bind:name="post.id" variant="primary" class="text-white" size="sm" v-on:click="detail(post.id)">See more</b-button>
-              <b-button v-bind:name="post.id" variant="warning" class="text-white" size="sm" v-on:click="edit(post.id)">Edit</b-button>
-              <b-button v-bind:name="post.id" variant="danger" class="text-white" size="sm" v-on:click="destroid(post.id)">Delete</b-button>
+              <b-button v-if="roleId == 1" v-bind:name="post.id" variant="warning" class="text-white" size="sm" v-on:click="edit(post.id)">Edit</b-button>
+              <b-button v-if="roleId == 1" v-bind:name="post.id" variant="danger" class="text-white" size="sm" v-on:click="destroid(post.id)">Delete</b-button>
             </b-card>
         </b-col>
       </b-row>
@@ -60,17 +61,23 @@
 
 <script>
 import axios from 'axios'
+import NavBar from '@/components/NavBar'
 
 export default {
   name: 'Posts',
+  components: {
+    NavBar
+  },
   data () {
     return {
       user: null,
       posts: [],
+      roleId: null,
       pagination: []
     }
   },
   mounted () {
+    this.roleId = window.localStorage.getItem('user_role_id')
     this.allPost()
   },
   computed: {

@@ -3,7 +3,7 @@
     <b-container fluid>
         <b-row class="my-1 justify-content-center">
         <h1>Create Post</h1>
-        <b-col md="4">
+        <b-col md="4" v-if="roleId == 1">
           <b-form @submit.prevent="store">
             <b-form-group
               id="fieldset-1"
@@ -46,6 +46,9 @@
           </b-form>
           <b-alert show variant="danger" v-if="error">{{error}}</b-alert>
         </b-col>
+         <b-col md="4" v-if="roleId != 1">
+          <b-alert show variant="danger" >You do not have sufficient permissions to create a post</b-alert>
+        </b-col>
         </b-row>
     </b-container>
   </div>
@@ -65,6 +68,7 @@ export default {
       category: '',
       error: '',
       photo: '',
+      roleId: null,
       selected: null,
       options: [
         { value: null, text: 'Please select an option' }
@@ -99,6 +103,7 @@ export default {
     }
   },
   mounted () {
+    this.roleId = window.localStorage.getItem('user_role_id')
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`

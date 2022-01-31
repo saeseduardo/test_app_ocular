@@ -1,5 +1,6 @@
 <template>
     <div>
+    <navBar></navBar>
       <b-row class="justify-content-center">
         <h3>Post</h3>
         <b-col md="6" offset-md="2">
@@ -85,9 +86,13 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import NavBar from '@/components/NavBar'
 
 export default {
   name: 'Detail',
+  components: {
+    NavBar
+  },
   data () {
     return {
       user: null,
@@ -97,6 +102,7 @@ export default {
       commentPostId: '',
       commentPostTitle: '',
       likes: 0,
+      roleId: null,
       post: {}
     }
   },
@@ -114,6 +120,7 @@ export default {
   },
 
   mounted () {
+    this.roleId = window.localStorage.getItem('user_role_id')
     const config = {
       headers: {
         Authorization: `Bearer ${window.localStorage.getItem('token')}`
